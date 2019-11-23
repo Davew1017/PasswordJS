@@ -1,70 +1,77 @@
-var passwordPrompt = prompt("Enter a password between 8-128 characters, one number, one lowecarse, and one uppercase character");
-
-var myInput = document.getElementById("psw");
-var letter = document.getElementById("letter");
-var capital = document.getElementById("capital");
-var number = document.getElementById("number");
-var symbol = document.getElementById("symbol");
-var length = document.getElementById("length");
-
-// When the user clicks on the password field, show the message box
-myInput.onfocus = function() {
-  document.getElementById("message").style.display = "block";
+var clipboard = new Clipboard('.copy')
+var lowercase = "abcdefghijklmnopqrstuvwxyz",
+  uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  numbers = "0123456789",
+  punctuation = "!@#$%^&*()_+~`|}{[]:;?><,./-=",
+  lowercaseInput = document.getElementById("lowercase"),
+  uppercaseInput = document.getElementById("uppercase"),
+  punctuationInput = document.getElementById("punctuation"),
+  numbersInput = document.getElementById("numbers"),
+  lengthInput = document.getElementById("length"),
+  passwordFeild = document.getElementById("pass-field"),
+  generateButton = document.getElementById("generate"),
+  copyButton = document.getElementById("copy"),
+  plength,
+  userPassword,
+  passwordCharSet;
+ 
+function generate() {
+  userPassword = "";
+  passwordCharSet = "";
+  if (lowercaseInput.checked) {
+    passwordCharSet += lowercase;
+  }
+  if (uppercaseInput.checked) {
+    passwordCharSet += uppercase;
+  }
+  if (punctuationInput.checked) {
+    passwordCharSet += punctuation;
+  }
+  if (numbersInput.checked) {
+    passwordCharSet += numbers;
+  }
+  plength = Number(lengthInput.value);
+ 
+  for (let i = 0; i < plength; i++) {
+    userPassword += passwordCharSet.charAt(
+      Math.floor(Math.random() * passwordCharSet.length)
+    );
+  }
+  if (userPassword == "") {
+    let alertbox = document.getElementById('alert');
+    alertbox.innerHTML = "Please select an option before generating"
+    alertbox.classList.add('fail');
+    setTimeout(function(){ 
+      alertbox.classList.remove('fail');
+    }, 3000);
+  } else {
+    passwordFeild.innerHTML = userPassword;
+  }
+  copyButton.setAttribute("data-clipboard-text", userPassword)
 }
-
-// When the user clicks outside of the password field, hide the message box
-myInput.onblur = function() {
-  document.getElementById("message").style.display = "none";
-}
-
-// When the user starts to type something inside the password field
-myInput.onkeyup = function() {
-  // Validate lowercase letters
-  var lowerCaseLetters = /[a-z]/g;
-  if(myInput.value.match(lowerCaseLetters)) {  
-    letter.classList.remove("invalid");
-    letter.classList.add("valid");
-  } else {
-    letter.classList.remove("valid");
-    letter.classList.add("invalid");
-  }
-  
-  // Validate capital letters
-  var upperCaseLetters = /[A-Z]/g;
-  if(myInput.value.match(upperCaseLetters)) {  
-    capital.classList.remove("invalid");
-    capital.classList.add("valid");
-  } else {
-    capital.classList.remove("valid");
-    capital.classList.add("invalid");
-  }
-
-  // Validate numbers
-  var numbers = /[0-9]/g;
-  if(myInput.value.match(numbers)) {  
-    number.classList.remove("invalid");
-    number.classList.add("valid");
-  } else {
-    number.classList.remove("valid");
-    number.classList.add("invalid");
-  }
-
-  var symbols = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}]/g;
-  if(myInput.value.match(symbols)) {  
-    symbol.classList.remove("invalid");
-    symbol.classList.add("valid");
-  } else {
-    symbol.classList.remove("valid");
-    symbol.classList.add("invalid");
-  }
-
-  
-  // Validate length
-  if(myInput.value.length >= 8 <= 128) {
-    length.classList.remove("invalid");
-    length.classList.add("valid");
-  } else {
-    length.classList.remove("valid");
-    length.classList.add("invalid");
-  }
-}
+generateButton.addEventListener("click", generate);
+ 
+clipboard.on('success', function(e) {
+    console.info('Action:', e.action);
+    console.info('Text:', e.text);
+    console.info('Trigger:', e.trigger);
+    let alertbox = document.getElementById('alert');
+    alertbox.innerHTML = "Copied!"
+    alertbox.classList.add('success');
+    setTimeout(function(){ 
+      alertbox.classList.remove('success');
+    }, 3000);
+    
+    e.clearSelection();
+});
+ 
+clipboard.on('error', function(e) {
+    console.error('Action:', e.action);
+    console.error('Trigger:', e.trigger);
+  let alertbox = document.getElementById('alert');
+    alertbox.innerHTML = "Try select the text to copy"
+    alertbox.classList.add('fail');
+    setTimeout(function(){ 
+      alertbox.classList.remove('fail');
+    }, 3000);
+});
